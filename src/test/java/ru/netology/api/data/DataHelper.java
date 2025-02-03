@@ -19,13 +19,7 @@ public class DataHelper {
     public static AuthInfo authInfo() {
         AuthInfo authInfo = new AuthInfo("vasya", "qwerty123");
 
-        given()
-                .spec(Specification.requestSpecification())
-                .body(authInfo)
-                .when()
-                .post("/auth")
-                .then()
-                .statusCode(HttpStatus.SC_OK);
+        ApiHelper.authorization(authInfo);
 
         return authInfo;
     }
@@ -37,23 +31,7 @@ public class DataHelper {
     }
 
     public static String verificationCode(AuthInfo authInfo) {
-        String code = SQLHelper.getCode(authInfo);
-
-        try {
-            VerificationCode verificationCode = new VerificationCode(authInfo.getLogin(), code);
-
-            return given()
-                    .spec(Specification.requestSpecification())
-                    .body(verificationCode)
-                    .when()
-                    .post("/auth/verification")
-                    .then()
-                    .statusCode(HttpStatus.SC_OK)
-                    .extract()
-                    .path("token");
-        } finally {
-            SQLHelper.deleteCode(code);
-        }
+        return ApiHelper.verification(authInfo);
     }
 
     public static int getCardBalance(String token, String indexCard) {
