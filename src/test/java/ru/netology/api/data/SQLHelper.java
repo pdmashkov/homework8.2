@@ -48,4 +48,19 @@ public class SQLHelper {
             runner.update(conn, dataSQL, code);
         }
     }
+
+    @SneakyThrows
+    public static void deleteTestData() {
+        var dataSQLAuthCodes = "delete from auth_codes;";
+        var dataSQLCardTransactions = "delete from card_transactions;";
+        var dataSQLCards = "delete from cards;";
+        var dataSQLUsers = "delete from users;";
+
+        try (var conn = getConnection()) {
+            runner.update(conn, dataSQLAuthCodes);
+            runner.update(conn, dataSQLCardTransactions);
+            runner.update(conn, dataSQLCards);
+            runner.update(conn, dataSQLUsers);
+        }
+    }
 }
