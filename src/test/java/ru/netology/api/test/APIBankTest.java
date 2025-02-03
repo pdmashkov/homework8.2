@@ -1,13 +1,12 @@
 package ru.netology.api.test;
 
-import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.netology.api.data.ApiHelper;
 import ru.netology.api.data.DataHelper;
-import ru.netology.api.data.Specification;
-
-import static io.restassured.RestAssured.given;
+import ru.netology.api.data.SQLHelper;
 
 public class APIBankTest {
     private String token;
@@ -35,14 +34,7 @@ public class APIBankTest {
 
         DataHelper.TransferMoney transferMoney = new DataHelper.TransferMoney(firstCardNumber, secondCardNumber, amount);
 
-        given()
-                .spec(Specification.requestSpecification())
-                .header("Authorization", "Bearer " + token)
-                .body(transferMoney)
-                .when()
-                .post("/transfer")
-                .then()
-                .statusCode(HttpStatus.SC_OK);
+        ApiHelper.transferMoney(transferMoney, token);
 
         int actualFirstCardBalance = DataHelper.getCardBalance(token, "0") - amount;
         Assertions.assertEquals(balanceFirstCard, actualFirstCardBalance);
@@ -57,19 +49,17 @@ public class APIBankTest {
 
         DataHelper.TransferMoney transferMoney = new DataHelper.TransferMoney(secondCardNumber, firstCardNumber, amount);
 
-        given()
-                .spec(Specification.requestSpecification())
-                .header("Authorization", "Bearer " + token)
-                .body(transferMoney)
-                .when()
-                .post("/transfer")
-                .then()
-                .statusCode(HttpStatus.SC_OK);
+        ApiHelper.transferMoney(transferMoney, token);
 
         int actualFirstCardBalance = DataHelper.getCardBalance(token, "0") + amount;
         Assertions.assertEquals(balanceFirstCard, actualFirstCardBalance);
 
         int actualSecondCardBalance = DataHelper.getCardBalance(token, "1") - amount;
         Assertions.assertEquals(balanceSecondCard, actualSecondCardBalance);
+    }
+
+    @AfterAll
+    public static void tearDown() {
+        SQLHelper.deleteTestData();
     }
 }
